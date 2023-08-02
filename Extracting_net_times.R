@@ -8,7 +8,7 @@
 
 #STEP 1: Checking the 'raw material'. 
 
-#Setting work diectory
+#Setting work directory
 
 setwd("C:/Users/nanick73/OneDrive - NERC/Documents/Chapter2_KLF/Data")
 
@@ -55,4 +55,55 @@ length(big.df$Id)
 
 #Write to csv
 write.csv(big.df, "KRILLBASE_KLF_data.csv")
-use_github()
+
+
+
+#2===========================================================================
+#the below is from the script "NDandKLF"
+
+#Aim: This script just adds net start date and start time (seperated), to the net data csv. Only for JR15002. 
+#Likely will delete this portion once I find the updated way I do this. 
+#Natalie Nickells 8th May 
+install.packages('tidyverse')
+install.packages('chron')
+library(chron)#this will clash with lubridate
+library(tidyverse)
+setwd('C:\\Users\\nanick73\\OneDrive - NERC\\Documents\\Chapter2_KLF\\Data')
+
+#Reading in KLF data #so i am just testing for JR15002 here
+KLF <- read.csv("JR15002_KRILLBASE_KLF.csv")
+ND <- read.csv("JR15002_NETDATA.csv")
+
+
+colnames(KLF) #GMTtime is the time column
+colnames(ND) #Start.of.event and End.of.event are the time columns
+
+#Need to change time format in KLF and ND by adding extra columns
+view(ND)
+#Splitting ND start time into date and time
+starts <- t(as.data.frame(strsplit(ND$Start.of.Event,' ')))
+colnames(starts) <- c('start.date', 'start.time')
+rownames(starts)<- NULL
+starts <- as.data.frame(starts)
+
+view(starts)
+
+#ENDING VERSION NOT WORKING, COME BACK TO. ROWS 123 to 125 have missing data which can't be converted. 
+ends = t(as.data.frame(strsplit(ND$End.of.event,' ')))
+test <- as.data.frame (ends [1:123])
+
+
+view(ND$End.of.event)
+
+
+colnames(ends) = c('end.date', 'end.time')
+rownames(ends)=NULL
+ends <- as.data.frame(ends)
+
+ND <- mutate(ND, 
+             start.date= starts$start.date, 
+             start.time = starts$start.time)
+
+
+
+
