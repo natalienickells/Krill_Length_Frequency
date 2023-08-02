@@ -514,6 +514,8 @@ ND.B <- rbind(JR17002.ND, JR16003.ND, JR15004.ND, JR304.ND)
 
 (ND.A$Start.of.Event)#no 24 hour times
 (ND.B$Start.of.Event)#no 24 hour times
+
+
 #Removing duplicates
 #want to remove Taxon.name, Taxon.class, Abundm3, Abundm2
 ND.A<- select(ND.A, !(c(Taxon.name, Taxon.class, Abundm3, Abundm2)))
