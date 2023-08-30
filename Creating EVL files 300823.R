@@ -40,6 +40,10 @@ str(exmpl.evl.r)
 
 #then just a matter of formatting. 
 
-view (nm)
 
+#Changing the Julian dates to normal=========================================
+
+
+nm$G.Date <- as.POSIXct(as.Date(nm$J.Date, 
+                                origin = as.Date(paste0(nm$Year, "-01", "-01"))))
 
