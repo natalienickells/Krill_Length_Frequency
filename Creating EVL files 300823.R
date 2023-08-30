@@ -11,6 +11,7 @@ setwd("D:/Cruise_data/")
 
 #Loading required packages
 library(tidyverse)
+library(EchoviewR)
 
 #Reading in ACO files
 #IMPORTANT: Before reading in ACO files, need to open them in Notepad and save them as txt. 
@@ -25,6 +26,20 @@ tplcolnames<- unlist(as.vector(tplcolnames))
 
 
 colnames(nm)<- c("Year", "J.Date", "J.Day", "J.Time", tplcolnames)
+
+
+#Reading in an example EVL so I can see the format I need. 
+exmpl.evl.r <- readevl2R("JR177/Net lines/net-27.evl")
+str(exmpl.evl.r)
+#the structure of exmpl.evl.r (R EVL format) seems much more complicated than 
+#just creating a txt file like the EVR....
+#either way, I'll need the same info to make: 
+#date, in yyyymmdd format
+#time in hhmmss0000 format
+#depth to 6 decimal places
+
+#then just a matter of formatting. 
+
 
 
 
