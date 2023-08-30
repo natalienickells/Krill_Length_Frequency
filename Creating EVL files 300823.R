@@ -6,11 +6,18 @@
 
 
 #PREPARATION==============================================================================
+#Setting working directory 
+setwd("D:/Cruise_data/")
 
 #Loading required packages
 library(tidyverse)
-library(swatches) #need this package to read in the Aco file
 
 #Reading in ACO files
 
-read_aco
+#IMPORTANT: Before reading in ACO files, need to open them in Notepad and save them as txt. 
+#If they are read in as aco, using the 'swatches' package, a vector of 00s is generated. 
+
+
+
+
+  
