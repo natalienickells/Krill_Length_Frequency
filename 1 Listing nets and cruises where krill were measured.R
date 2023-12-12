@@ -1,4 +1,6 @@
- 
+#1 Listing nets and cruises where krill were measured
+
+
 #Natalie Nickells
 #12th December 2023
 #Aim: Identifying cruises & nets for which I have krill length data
@@ -18,7 +20,7 @@ library(openxlsx)
 #Setting working directory 
 setwd("D:\\Cruise_data\\")
 
-#DATA IMPORT====================================================================
+#LIST OF NETS ====================================================================
 #My data for each cruise has a different name and filepath. 
 #I have a spreadsheet where these different filepaths are kept, so will first read this in. 
 
@@ -117,6 +119,14 @@ for(i in 1: nrow(filepathinfo)) {
 }
 
 
+#Doing some extra net name filtering after the loop
+#Could definitely even do some more filtering here, but will come back to (eg.r emoving spaces, removing JR100_JR100_)
+pos<- str_which(output$netnames, "freq|_T|swarm|CB|comp|JR082|layr", negate=T ) 
+#removing JR082 nets here because their format is unclear, to come back to. 
+
+output<- output[pos,]
+
+write.csv(output, "netnames.csv", row.names=F)
 
 
 #At the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
