@@ -1,6 +1,6 @@
  
 #Natalie Nickells
-#11th December 2023
+#12th December 2023
 #Aim: Identifying cruises & nets for which I have krill length data
 
 #This script will be written in R Studio but version control will be used, 
@@ -28,8 +28,33 @@ filepathinfo<- read_excel("D:\\KLF Cruises & Nets - Data Tracking Sheet.xlsx")
 filepathinfo<- select(filepathinfo, Cruise_ID, KL_Data_Filepath, KL_Data_Format) 
 filepathinfo<- slice(filepathinfo, 1:20)
 
+#Reading in krill length frequency information, named as CruiseKLFrawdata
+for(i in 1: nrow(filepathinfo)) {
+  
+  cruise<- filepathinfo$Cruise_ID[i]
+  filepath<-filepathinfo$KL_Data_Filepath[i]
+  
+  if(grepl(".csv", filepath)){
+    assign(print(paste0(cruise, "KLFrawdata")), read.csv(print(paste0(filepath))))
+    }
+  
+  
+  if(grepl(".xlsx", filepath)){
+    assign(print(paste0(cruise, "KLFrawdata")), read_excel(print(paste0(filepath))))
+  }
+  
+  
+  if(grepl(".xls", filepath)){
+    assign(print(paste0(cruise, "KLFrawdata")), read_excel(print(paste0(filepath))))
+  }
+  
+}
 
-print(filepathinfo$KL_Data_Filepath)
+#at the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
+#think that I can use some of my scripting from Lizzie density reading script to read in each tab. 
+
+
+
 
 
 
