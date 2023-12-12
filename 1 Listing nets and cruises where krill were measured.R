@@ -29,33 +29,74 @@ filepathinfo<- select(filepathinfo, Cruise_ID, KL_Data_Filepath, KL_Data_Format)
 filepathinfo<- slice(filepathinfo, 1:20)
 
 #Reading in krill length frequency information, named as CruiseKLFrawdata
+
+
 for(i in 1: nrow(filepathinfo)) {
   
   cruise<- filepathinfo$Cruise_ID[i]
   filepath<-filepathinfo$KL_Data_Filepath[i]
   
-  if(grepl(".csv", filepath)){
-    assign(print(paste0(cruise, "KLFrawdata")), read.csv(print(paste0(filepath))))
+  if(grepl(".csv", filepath)){ #at the mo this is only true for JR228 
+    df <-read.csv((paste0(filepath)))
+    
+    df <- unite(df, common.code, c(Cruise,Event, Netno))
+    
+    assign(print(paste0(cruise, "KLFrawdata")), df)
+    
+    #then will want to add those common codes, along with the cruise, to a blank dataframe that I will want to populate
+    rm(df)
     }
   
   
   if(grepl(".xlsx", filepath)){
-    assign(print(paste0(cruise, "KLFrawdata")), read_excel(print(paste0(filepath))))
+    assign(print(paste0(cruise, "KLFrawdata")), read_excel((paste0(filepath))))
   }
   
   
   if(grepl(".xls", filepath)){
-    assign(print(paste0(cruise, "KLFrawdata")), read_excel(print(paste0(filepath))))
+    assign(print(paste0(cruise, "KLFrawdata")), read_excel((paste0(filepath))))
   }
   
 }
 
-#at the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
+#At the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
 #think that I can use some of my scripting from Lizzie density reading script to read in each tab. 
 
+#Also could just make this script into also reading in krill length data and saving it. Since I'm pretty much going to be there already. 
+
+
+#in pseudo code
+
+#if it has the format of KLF data from the PDC, to get the net names, 
+#read in the data and then go to the event name column and find all the unique net names
+#make a variable of cruise, event name, net number 
+#add the cruise name on the front before adding them to an overall list of net names
+
+#if it has the format of a spreadsheet, with each tab as a net, 
+#read in the tab names and these are the event names
+#add the cruise name on the front before adding them to an overall list of net names
+
+#if it has another format
+#print the cruise name with a message 'problematic format, net names to be extracted by hand
+
+#and then will extract those net names outside of the function. 
 
 
 
+#Rememberering what the excel sheets function does
 
+test<- excel_sheets(filepathinfo$KL_Data_Filepath[15])
+#okay so it literally just gets the names of the tabs out and makes them ito a vector 
 
+path <- (filepathinfo$KL_Data_Filepath[15])
+test<- lapply(excel_sheets(path), read_excel, path = path)
+#this makes a list, with each tab under it/ 
+#again i think go back to lizzie code and this will help here. 
 
+?readxl
+
+read_xls
+
+install.packages("readxl")
+library(readxl)
+filepathinfo$KL_Data_Filepath[15]
