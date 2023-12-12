@@ -3,10 +3,12 @@
 #12th December 2023
 #Aim: Identifying cruises & nets for which I have krill length data
 
-#testing adding a line at my laptop. 
-
 #This script will be written in R Studio but version control will be used, 
 #in GitHub repo Krill_Length_Frequency
+
+
+#this is a test change to show tom 
+
 
 #This script is an updated version of "ExtractingEventNAmes.R", at filepath D:\R code\ExtractingEventNAmes.R
 
@@ -56,7 +58,7 @@ for(i in 1: nrow(filepathinfo)) {
     #then will want to add those common codes, along with the cruise, to a blank dataframe that I will want to populate
     rm(df)
     }
-  
+    
   
   if(grepl(".xlsx", filepath)){
     
