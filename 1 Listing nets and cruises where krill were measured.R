@@ -7,9 +7,6 @@
 #in GitHub repo Krill_Length_Frequency
 
 
-#this is a test change to show tom 
-
-
 #This script is an updated version of "ExtractingEventNAmes.R", at filepath D:\R code\ExtractingEventNAmes.R
 
 #SET UP=========================================================================
@@ -41,7 +38,7 @@ for(i in 1: nrow(filepathinfo)) {
   
   cruise<- filepathinfo$Cruise_ID[i]
   filepath<-filepathinfo$KL_Data_Filepath[i]
-  
+  print(filepath)
   if(grepl(".csv", filepath)){ #at the mo this is only true for JR228 
     
     #Reading in CSV file
@@ -56,13 +53,17 @@ for(i in 1: nrow(filepathinfo)) {
     assign(print(paste0(cruise, "KLFrawdata")), df)
     
     #then will want to add those common codes, along with the cruise, to a blank dataframe that I will want to populate
+    
     rm(df)
+    
+    
     }
     
   
   if(grepl(".xlsx", filepath)){
     
     netnames<- (paste0(cruise,"_", getSheetNames(filepath)))
+    #print(netnames)
     #assign(print(paste0(cruise, "KLFrawdata")), read_excel((paste0(filepath))))
   }
   
@@ -82,6 +83,20 @@ for(i in 1: nrow(filepathinfo)) {
   #cruise in one column
   #netnames in another column
   
+  #Filtering net names
+  
+  #Making a vector of all the net names I don't want
+ 
+  remove<- c("Summary", "SUMMARY", "plot",  "all", "combined", "Combined", 
+             "comparison", "t-test", "Thys", "T", "F", "RMT25",
+            "frig", "thyso", "hist", "Frigida", "All", "Sheet", "corebox", 
+             "Graphs" ) 
+  #netnames<- netnames[str_which(netnames, paste(remove, collapse= "|"), negate = TRUE)] #gives position
+  print(netnames)#have an error with DY098 which pops up here. 
+  print(str_which(netnames, paste(remove, collapse= "|"), negate = TRUE))
+  netnames<- str_replace_all(netnames, "RMT8|Event|Ev|EV|E|e", "")
+  netnames<- str_replace_all(netnames, "N", "_")
+
   #Making dataframe of net names
   temp<- data.frame(netnames, 
                        cruise)
@@ -89,8 +104,19 @@ for(i in 1: nrow(filepathinfo)) {
   #Binding to existing dataframe
   output<- rbind(output, temp)
   
-  rm(temp)
+  rm(temp, netnames, cruise, filepath)
 }
+#curently having an error with DY098
+test<- str_remove_all(output$netnames, "RMT8|Event|Ev|EV|E|e")
+print(test)
+str_which(output$netnames, "SUMMARY", negate = FALSE) #gives position
+str_detect(output$netnames, "SUMMARY", negate = FALSE) #gives T/F
+
+output$netnames[print(paste0(str_which(output$netnames, paste(remove, collapse= "|"), negate = TRUE)))] #gives position
+
+
+
+output$netnames[str_which(output$netnames, paste(remove, collapse= "|"), negate = TRUE)]
 
 
 #At the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
