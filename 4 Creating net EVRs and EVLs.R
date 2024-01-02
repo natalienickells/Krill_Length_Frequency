@@ -10,6 +10,10 @@
 #This script is an updated version/draws heavily on Creating EVL files 311023.R, 
 #at filepath "D:\R code\Creating EVL files 311023.R"
 
+
+#TK but also have a look  for source scripts in the folder Automating Regions...
+
+
 #Data sources:
 
 #Data outputs:
