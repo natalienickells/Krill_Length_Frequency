@@ -19,6 +19,7 @@
 #the nets where krill have been measured. 
 
 #Data sources: 
+#Cruises&theirfolders document needs updating. 
 #Raw data is from the SONA computer's Samba drive (TK actually at the mo from sophje samba drive, need to change this. )
 #Net times currently coming from the file krillnets.A, filepath "E:/krillnets.A.txt"
 #TK will want to change this file later, likely to one that incorporates depths too. 
@@ -34,6 +35,7 @@
 #2 will want to update the script to include ek80 files possibly 
 #(or this might be a different script, as it would be adding to an existing Ev file... hmm.. 
 #but would i still want a list of these files to be generated here? hmm)
+#3Need to update source file Cruises&theirfolders
 
 #0 SET UP========================================================================
 library(tidyverse)
