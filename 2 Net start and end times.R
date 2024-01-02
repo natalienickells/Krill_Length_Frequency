@@ -2,7 +2,7 @@
 
 
 #Natalie Nickells
-#12th December 2023
+#2nd January 2024
 
 #Aim: to get net start and end times from a list of nets where krill were measured. 
 

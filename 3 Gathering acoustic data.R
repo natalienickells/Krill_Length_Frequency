@@ -9,7 +9,6 @@
 
 #This script will be written in R Studio but version control will be used, 
 #in GitHub repo Krill_Length_Frequency
-
 #This script is an updated version/draws heavily on "Selecting_raw_files040823.R", 
 #at filepath "D:\R code\Selecting_raw_files040823.R"
 
