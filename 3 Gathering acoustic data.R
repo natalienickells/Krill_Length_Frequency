@@ -18,27 +18,52 @@
 #amount of acoustic data, I will gather together only the acoustic data around 
 #the nets where krill have been measured. 
 
+#Data sources: 
+#Raw data is from the SONA computer's Samba drive (TK actually at the mo from sophje samba drive, need to change this. )
+#Net times currently coming from the file krillnets.A, filepath "E:/krillnets.A.txt"
+#TK will want to change this file later, likely to one that incorporates depths too. 
+#This file will be created in script 2. 
+
+#Data output:
+#the csv ref.A, filepath "D:\\Natalie\\ref.A.csv", is like krillnets.A but with added net times. 
+#raw files to use for ev file crteation are saved to "D:/Natalie/JCRRawFiles"
+
+
+#Current issues; 
+#1 I don't know whether this is the version of the script with the 12/24 hr issue. need to check thisd
+#2 will want to update the script to include ek80 files possibly 
+#(or this might be a different script, as it would be adding to an existing Ev file... hmm.. 
+#but would i still want a list of these files to be generated here? hmm)
+
 #0 SET UP========================================================================
 library(tidyverse)
 library(fs)
 #Loading in useful data
 
-cruise.folders <-  read.csv("D:/Natalie/Cruises&theirfolders.csv")
+cruise.folders <- # read.csv("D:/Natalie/Cruises&theirfolders.csv") #filepath when on sona
+  #using a different filepath when on  laptop
+  read.csv("D:\\Copy.of.Natalie.SONA\\Cruises&theirfolders.csv")
+#this csv contains a list of the folder name for each cruise. 
+#CURRENTLY THIS ONLY INCLUDES CRUISES JR17002 jr16003 JR15004 jr15002 
+#jr304 jr291 jr280 jr260 jr177
+#TK NEED TO UPDATE THIS WHEN I AM ON SONA COMPUTER, WITH MISSING CRUISES. 
+
 cruise.folders$Folder<-as.character(cruise.folders$Folder)
 
 #1 Making a dataframe of all the available .raw files===========================
 #Making dataframe column of source directories
 cruise.folders$sourcedir <- paste0( "S:/cruise_data/", cruise.folders$Folder)
+#TK will need to change this filepath too, so make it be using SONA rather than sof..
 
 targetdir<- ("D:/Natalie/JCRRawFiles") 
-
+#where the raw files will be saved to. 
 
 rawfiles<- as.data.frame(NULL) #making blank df to fill in the loop
 
-for(i in (1:(nrow(cruise.folders)))){
+for(i in (1:(nrow(cruise.folders)))){ #for each cruise
   sourcedir<- paste0(cruise.folders$sourcedir[i]) #assign source directory
   
-  cruiseraws <- list.files(sourcedir, pattern= 'D.+T.+raw$', full.names=TRUE, recursive=TRUE)
+  cruiseraws <- list.files(sourcedir, pattern= 'D.+T.+raw$', full.names=TRUE, recursive=TRUE) #list all the raw files in that directory
   
   #then filter cruise raws to be ek60 only and no work
   
@@ -47,12 +72,15 @@ for(i in (1:(nrow(cruise.folders)))){
   cruiseraws <- filter(cruiseraws, 
                        (grepl("ek60", cruiseraws, ignore.case=T)) & #ek60 present in filepath
                          (!grepl("work",cruiseraws, ignore.case=T)) & #work not present in filepath
-                         (!grepl("calibration", cruiseraws, ignore.case=T ))) 
+                         (!grepl("calibration", cruiseraws, ignore.case=T ))) #calibration not present in filepath
   
-  rawfiles<- rbind(cruiseraws, rawfiles)
+  rawfiles<- rbind(cruiseraws, rawfiles) #make a list of all these raw file names
 }
 #some error codes- overlong paths. 11 files affected. COME BACK TO
+#TK check on these errors...? think they are now 'gone'.
 
+#TK I will also need to check which cruises need EK80 data! 
+#or those cruises, I will want to use something very similar, but filtering for EK80 instead of EK60. 
 
 #==============================================================================
 #2 Extracting time and date 
@@ -76,12 +104,12 @@ rawfiles <- mutate(rawfiles,
                    date.time = as.POSIXct
                    (date.time, format= "%Y%m%d.%H%M%S"))
 
-rawfiles<- select(rawfiles, cruiseraws, date.time)
+rawfiles<- select(rawfiles, cruiseraws, date.time) #making a dataframe of just raw file names, and date-time.
 
 #Ordering dataframe by time
 rawfiles<- rawfiles[order(rawfiles$date.time),]
 #Adding rownumbers
-rawfiles$row.no <- c(1:(nrow(rawfiles))) #do i actually ever use row numbers later? check if i need
+rawfiles$row.no <- c(1:(nrow(rawfiles))) # TK do i actually ever use row numbers later? check if i need
 
 #Adding day variable
 rawfiles$date<- strftime(rawfiles$date.time,
@@ -95,6 +123,7 @@ rawfiles$filename <- basename(rawfiles$cruiseraws)
 #Loading in useful data
 #Times of krillnets
 krillnets.A<- read.table("E:/krillnets.A.txt", header=T)
+#TK as I change script 2 this name will likely change. 
 
 #Making a day variable
 krillnets.A$Start.of.Event<- as.POSIXct(krillnets.A$Start.of.Event, 
@@ -106,7 +135,7 @@ krillnets.A$net.date<- strftime(krillnets.A$Start.of.Event,
                                 format= "%d/%m/%Y")
 
 #removing rows with missing dates or times
-
+#TK look into which rows these are further.. WHY are these times missing?
 krillnets.A <- filter(krillnets.A, 
                       is.na(End.of.event)==FALSE)
 
@@ -127,15 +156,16 @@ rawneeded<- (NULL) #making a blank vector to fill in the loop
 for(i in (1:nrow(krillnets.A))){
   
   
-  net.start <- krillnets.A$aim.start[i]
-  net.end <- krillnets.A$aim.end[i]
+  net.start <- krillnets.A$aim.start[i] #maybe should rename this , this isn't the true net sstart but three hours later. 
+  net.end <- krillnets.A$aim.end[i] #ditto this
   
   net.date<- as.POSIXct(krillnets.A$net.date[i], format= "%d/%m/%Y")
   
-  prev.date<-net.date - lubridate::days(1)
-  next.date<-net.date + lubridate::days(1)
+  prev.date<-net.date - lubridate::days(1) #day before
+  next.date<-net.date + lubridate::days(1) #day after net
   
-  net.date<- as.character(net.date, '%d/%m/%Y')
+  #making the dates back into characters
+  net.date<- as.character(net.date, '%d/%m/%Y') 
   prev.date<- as.character(prev.date, '%d/%m/%Y')
   next.date<- as.character(next.date, '%d/%m/%Y')
   
@@ -188,7 +218,7 @@ for(i in (1:nrow(krillnets.A))){
   rawneeded4net<- rawneeded4net$cruiseraws
   
   
-  rawneeded<- c(rawneeded, rawneeded4net)
+  rawneeded<- c(rawneeded, rawneeded4net) #making a vector of all the raw files needed. 
   
   print(paste0("Processed ", i, " out of ", nrow(krillnets.A)))
   
