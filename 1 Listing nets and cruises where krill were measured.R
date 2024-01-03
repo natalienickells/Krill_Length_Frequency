@@ -2,7 +2,7 @@
 
 
 #Natalie Nickells
-#12th December 2023
+#3rd January 2024
 #Aim: Identifying cruises & nets for which I have krill length data
 
 #This script will be written in R Studio but version control will be used, 
@@ -10,6 +10,11 @@
 
 
 #This script is an updated version of "ExtractingEventNAmes.R", at filepath D:\R code\ExtractingEventNAmes.R
+
+#Known errors:
+#this script does not yet give all the net names that I need. Not processing those in a difficult format. 
+#Remember: I don't necessarily need to use every single cruise if some of them are
+#in nightmare format... but want to finally decide which ones I am using!!
 
 #SET UP=========================================================================
 #Loading required packages
