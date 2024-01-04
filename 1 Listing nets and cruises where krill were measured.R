@@ -1,9 +1,11 @@
 #1 Listing nets and cruises where krill were measured
+#and reading in the krill length frequency data
 
 
 #Natalie Nickells
 #4th January 2024
 #Aim: Identifying cruises & nets for which I have krill length data
+#Aim 2: Reading in the krill length frequency data for those nets, saving in a useful format
 
 #This script will be written in R Studio but version control will be used, 
 #in GitHub repo Krill_Length_Frequency
@@ -100,16 +102,17 @@ for(i in 1: nrow(filepathinfo)) {
   #Making a vector of all the net names I don't want
  
   remove<- c("Summary", "SUMMARY", "plot",  "all", "combined", "Combined", 
-             "comparison", "t-test", "Thys", "_T", "F", "RMT25",
+             "comparison", "t-test", "Thys", "_T", "_ET", "F", "RMT25",
             "frig", "thyso", "hist", "Frigida", "All", "Sheet", "corebox", 
              "Graphs" ) 
   netnames<- netnames[str_which(netnames, paste(remove, collapse= "|"), negate = TRUE)] #gives position
 
   print(str_which(netnames, paste(remove, collapse= "|"), negate = TRUE))
-  netnames<- str_replace_all(netnames, "RMT8|Event|Ev|EV|E|e", "")
-  netnames<- str_replace_all(netnames, "N", "_")
-  netnames<- str_replace_all(netnames, "JR100_JR100", "JR100")
-  netnames<- str_replace_all(netnames, " ", "")
+  netnames<- str_replace_all(netnames, "RMT_|RMT8|Event|Ev|EV|E|e", "")#rremove EMT8 etc labels for nets.
+  netnames<- str_replace_all(netnames, "N", "_")#replace N for net withh an underscrore
+  netnames<- str_replace_all(netnames, "JR100_JR100", "JR100") #remove weird double JR100 label
+  netnames<- str_replace_all(netnames, " ", "") #remove spaces
+  netnames<- str_replace_all(netnames, "__", "_") #replace double underscore with single underscore
 
   #now make dataframe 
   #cruise in one column
@@ -134,36 +137,27 @@ for(i in nrow(output)){
   #then do the filtering here
 }
 
-
-#Useful bits of filtering code from other script 
-#JR15004.KLF.events <- filter(JR15004.KLF.events, 
-                             #!(grepl("frig", 
-                                     #JR15004.KLF.events, ignore.case=T)) &
-                               #!(grepl("thy", 
-                                       #JR15004.KLF.events, ignore.case=T)) &
-                               #!(grepl("swarm",
-                                       #JR15004.KLF.events)) &
-                               #!(grepl("layer",
-                                       #JR15004.KLF.events)))
                              
 
 
 #Doing some extra net name filtering after the loop
 #TK Could definitely even do some more filtering here, but will come back to 
-pos<- str_which(output$netnames, "freq|swarm|CB|comp|JR082|layr", negate=T ) 
+pos<- str_which(output$netnames, "freq|swarm|CB|comp|JR082|layr|b", negate=T ) 
 #TK removing JR082 nets here because their format is unclear, to come back to. 
+#removing nets including 'b' as these were second measurings on the JR177 cruise, with less fresh krill. The data spreadsheet advises not to use these values. 
 #TK- for everything i'm removing here, need to go back to the spreadsheets 
-#and check what this actually represents, make sure i am not pointlessly losing data. 
+#and check what this actually represents, make sure i am not pointlessly losing data. #have now done this
 output<- output[pos,]
 
+#
 #Script refining/checking=====================================================
 #Examining this output, what do I have.... (basically looking for errors to correct later.)
 #Will basically need to go through cruise by cruise and check I have all the nets I expect to have.. 
 
 #Comparing how many cruises I have...
 unique(output$cruise)  
-length(unique(output$cruise)) #have 20 cruises
-#I have 21 cruises to target, so missing 2: JR082 and JR245
+length(unique(output$cruise)) #have 18 cruises
+#I have 20 cruises to target, so missing 2: JR082 and JR245
 
 
 
@@ -173,105 +167,115 @@ length(unique(output$cruise)) #have 20 cruises
 #Will go through and check the nets for each of the cruises I have
 #Also need to identify- which cruises are missing?   
 
-#DY098
-(filter(output, cruise== "DY098")) #29 nets
-#TK RMT_14_2 is just 14_2, ditto RMT_28_1
-#TK also some of these net names have double underscores...
-#TK 78_T is euphausia tricantha, not superba, so remove. 
-#78_1 very few euphausias measured... 79_1 only two measued.
-#93 only 3 measured
-#97_1 only 4 measured.
-#109_1 only 2 measured
-#TK 113_2_T is also not e superba. need to remove. 
-#TK basically need a filter later for a minimum nu,ber measured. 
+#DY098-----
+(filter(output, cruise== "DY098")) #29 nets, as expected.
 
+#78_1, 79_1, 93, 97_1, 109_1, and so on very few euphausids measured... 
+#TK basically need a filter later for a minimum nu,ber measured.
 
+ 
 
-#some of these have RMT names in too...
-#then I want to open the 
-
-#JR082
+#JR082----
+#Currently missing the net names for this, this is a different format than I've seen so far
 #there is one tab for all nets, so I need to read this in and extract the unique combos of net and event
 
-#JR096
-filter(output, cruise== "JR096") #all the nets I was expecting
-nrow(filter(output, cruise== "JR096"))#13 nets
+#JR096---
+filter(output, cruise== "JR096") 
+#13 nets, all as expected 
+
 
 #JR100
-filter(output, cruise== "JR100") #all the nets I was expecting
-nrow(filter(output, cruise== "JR100"))# 8 nets
+filter(output, cruise== "JR100") 
+#8 nets, all as expected 
+
 
 #JR116
-filter(output, cruise== "JR116") #3 nets, missing those associated with moorings and core box...
+filter(output, cruise== "JR116") 
+#3 nets, missing those associated with moorings and core box...
 #TK come back to: I think I probably want to keep those mooring/core box nets. 
 
 #JR177
-filter(output, cruise== "JR177") # have removed 'event 28 all nets', but there were only 10 krill measured there so this is fine. 
-#there are 'b' tabs included here, these are second measurings of the krill, but not fresh measurings so should discard, as per written on the tab. 
-#TK discard nets including 'b' from JR177 data. 
-nrow(filter(output, cruise== "JR177")) #51 nets for this cruise, good haul. 
+filter(output, cruise== "JR177") 
+#46 nets, all as expected
+#have removed 'event 28 all nets', but there were only 10 krill measured there so this is fine
+#have removed 'b' versions of the nets, which were second, less fresh, measurings of the krill. 
+
 
 #JR200
-filter(output, cruise== "JR200") #all the nets I was expecting, 9 nets. 
+filter(output, cruise== "JR200") 
+#9 nets, all as expected
+
 
 #JR228
-filter(output, cruise== "JR228") #hmmm.. this is correct but I have no udea how? Not in the format I was expecting when I opened the spreadhsset. 
+filter(output, cruise== "JR228") 
+#hmmm.. this is correct but I have no udea how? Not in the format I was expecting when I opened the spreadhsset. 
 # I obviously must have fixed this earlier. TK come back to. 7 nets. 
 #I think possibly the data from JR228 is not going to work, the krill length data is not great and I'm not sure there are many nets where krill were measured? Confusing.. 
 
 
 #JR230
-filter(output, cruise== "JR230") #nets expected. 2 nets. 96_1 has low krill measured number, so this could be a candidate for removing. 
+filter(output, cruise== "JR230") 
+#2 nets, as expected
+#Looking at the data, 96_1 has low krill measured number, so possibly could remove this entire cruise (only 1 useful net haul?)
 
 #JR245
 #currently no net names
 #complicated sheet layout, tread carefully. Use WCB and ECB tabs. 
 
 #JR255
-filter(output, cruise== "JR255")#nets expected, 14 nets
+filter(output, cruise== "JR255")
+#14 nets, all as expected
 
 #JR260
-filter(output, cruise== "JR260") #12 nets. nets expected except TK
+filter(output, cruise== "JR260") 
+#12 nets. nets as expected EXCEPT: 
 #tk net numbers (not event numbers) are missing because they feature inside the tab instead of in the tab name. 
 #need to fix this. maybe manually if quicker?
 
 #JR280
-filter(output, cruise== "JR280") #nets expected, 8 nets
+filter(output, cruise== "JR280") 
+#8 nets, as expected
 
 #JR291
-filter(output, cruise== "JR291") #nets expected, 10 nets
-#first net name (JR291_81_2) looks like it has a space at the front.
+filter(output, cruise== "JR291") 
+#10 nets, as expected
+
 
 #JR304
-filter(output, cruise== "JR304") #nets expected, 7 nets
+filter(output, cruise== "JR304") 
+#7 nets, all as expected
 
 #JR15002
-filter(output, cruise== "JR15002") #nets expected, 9 nets
-
+filter(output, cruise== "JR15002") 
+#9 nets, all as expected
 
 #JR15004
-filter(output, cruise== "JR15004") #nets expected, 19 nets
+filter(output, cruise== "JR15004") 
+#19 nets, all as expected
 #this KLF data spreadsheet also has some good information , eg comparing top and bottom of swarms
 #I won't be importing the data here but TK might be good to come back to. 
 
 
 #JR16003
-filter(output, cruise== "JR16003") #7 nets, nets expected
+filter(output, cruise== "JR16003") 
+#7 nets, all as expected
 
 
 #JR17002
-filter(output, cruise== "JR17002") #8 nets, nets expected
+filter(output, cruise== "JR17002")
+#8 nets, all as expected
 
 #JR19001
 filter(output, cruise== "JR19001")
 #48_1 has a tab but krill not measured so need to delete that one
 # all other nets as expected, 10 nets total, 9 without 48_1.
+output<- filter(output, netnames != "JR19001_48_1")
 
 
 
 #Output=======================
 write.csv (output, "netnames.csv", row.names=F)
-
+#218 cruises total
 
 
 
