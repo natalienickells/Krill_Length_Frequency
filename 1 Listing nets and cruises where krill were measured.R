@@ -125,14 +125,94 @@ for(i in 1: nrow(filepathinfo)) {
 
 
 #Doing some extra net name filtering after the loop
-#Could definitely even do some more filtering here, but will come back to (eg.r emoving spaces, removing JR100_JR100_)
+#TKCould definitely even do some more filtering here, but will come back to (eg.r emoving spaces, removing JR100_JR100_)
 pos<- str_which(output$netnames, "freq|_T|swarm|CB|comp|JR082|layr", negate=T ) 
 #removing JR082 nets here because their format is unclear, to come back to. 
 
 output<- output[pos,]
 
-write.csv(output, "netnames.csv", row.names=F)
+#Script refining/checking=====================================================
+#Examining this output, what do I have.... (basically looking for errors to correct later.)
+#Will basically need to go through cruise by cruise and check I have all the nets I expect to have.. 
 
+#Comparing how many cruises I have...
+unique(output$cruise) #have a cruise listed as NA... 
+length(unique(output$cruise)) #have 19 cruises (well 18 actually, excluding NAs)
+
+
+#Will go through and check the nets for each of the cruises I have
+#Also need to identify- which cruises are missing?   
+
+#DY098
+(filter(output, cruise== "DY098"))$netnames
+#some of these have RMT names in too...
+#then I want to open the 
+
+#JR096
+filter(output, cruise== "JR096")
+
+#JR100
+filter(output, cruise== "JR096")
+
+#JR116
+filter(output, cruise== "JR096")
+
+#JR177
+filter(output, cruise== "JR096")
+
+#JR200
+filter(output, cruise== "JR096")
+
+#JR228
+filter(output, cruise== "JR096")
+
+#JR230
+filter(output, cruise== "JR096")
+
+#JR255
+filter(output, cruise== "JR096")
+
+#JR260
+filter(output, cruise== "JR096")
+
+#JR280
+filter(output, cruise== "JR096")
+
+#JR291
+filter(output, cruise== "JR096")
+
+#JR304
+
+#JR15002
+
+#JR15004
+
+#JR16003
+
+#JR17002
+
+#JR19001
+
+#NA (still check this one, because what's gone wrong here? )
+
+
+
+
+
+
+#Output=======================
+write.csv (output, "netnames.csv", row.names=F)
+
+
+
+
+
+
+
+
+
+
+#Some dicussion of some of the errors ======================================
 
 #At the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
 #think that I can use some of my scripting from Lizzie density reading script to read in each tab. 
