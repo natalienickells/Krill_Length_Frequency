@@ -123,6 +123,31 @@ for(i in 1: nrow(filepathinfo)) {
   rm(temp, netnames, cruise, filepath)
 }
 
+#Filtering net names
+
+for(i in nrow(output)){
+  netname<- output$netnames[i]
+  
+  
+  #then do the filtering here
+}
+
+
+#Useful bits of filtering code from other script 
+JR15004.KLF.events <- filter(JR15004.KLF.events, 
+                             !(grepl("frig", 
+                                     JR15004.KLF.events, ignore.case=T)) &
+                               !(grepl("thy", 
+                                       JR15004.KLF.events, ignore.case=T)) &
+                               !(grepl("swarm",
+                                       JR15004.KLF.events)) &
+                               !(grepl("layer",
+                                       JR15004.KLF.events)))
+                             
+                             
+test<- str_remove(output$netnames, "Ev")#removing Ev from event numbers
+
+JR177.KLF.events <- str_replace(JR177.KLF.events, "N", "_")
 
 #Doing some extra net name filtering after the loop
 #TKCould definitely even do some more filtering here, but will come back to (eg.r emoving spaces, removing JR100_JR100_)
@@ -240,6 +265,111 @@ test<- lapply(excel_sheets(path), read_excel, path = path)
 #this makes a list, with each tab under it/ 
 #again i think go back to lizzie code and this will help here. 
 
+
+#Code from Data read in latest 08 12 23 
+#JR17002 data is in JR17002KLF (list) and for JR16003 in JR16003KLF (list )
+
+files_length <- c("D:\\Cruise_data\\JR17002\\JR17002_krill_length_V2.xlsx",
+                  "D:\\Cruise_data\\JR16003\\Krill_lengths_JR16003.xls")
+
+library(readxl)     
+multiplesheets <- function(fname) { 
+  
+  # getting info about all excel sheets 
+  sheets <- readxl::excel_sheets(fname) 
+  tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x)) 
+  data_frame <- lapply(tibble, as.data.frame) 
+  
+  # assigning names to data frames 
+  names(data_frame) <- sheets 
+  
+  # print data frame 
+  print(data_frame) 
+} 
+
+## read in file 1 as a list
+f1 <- multiplesheets(files_length[1])
+
+## number of dataframes in the list: length(f1)
+length(f1)
+## get to data using f1[[1]]
+## get to net name using names(f1)[1]
+
+## data frame to store in
+df_length <- data.frame()
+
+## loop over each dataframe in the list to fill in df_length
+for (i in 1:length(f1)) {
+  # i <- 1  # testing
+  
+  ## get data
+  i_df <- f1[[i]]
+  ## get name
+  i_name <- names(f1[i])
+  i_name <- sub("^Ev", "JR17002_", i_name)
+  
+  ## make data frame from this net
+  i_df2 <- data.frame(netname = i_name,
+                      krill_length = i_df$Length)
+  
+  ## add it to the main results dataframe
+  df_length <- rbind(df_length, i_df2)
+  
+  rm(i, i_df, i_name, i_df2)
+}
+
+head(df_length)
+tail(df_length)
+table(df_length$netname, useNA="ifany")
+
+## now get the data from file 2
+
+## read in file 2 as a list
+f2 <- multiplesheets(files_length[2])
+f2 <- f2[-which(names(f2)=="all")]
+
+## loop over each dataframe in the list to fill in df_length
+for (i in 1:length(f2)) {
+  # i <- 1  # testing
+  
+  ## get data
+  i_df <- f2[[i]]
+  ## get name
+  i_name <- names(f2[i])
+  i_name <- sub("^Event ", "JR16003_", i_name)
+  
+  ## make data frame from this net
+  i_df2 <- data.frame(netname = i_name,
+                      krill_length = i_df$Length)
+  
+  ## add it to the main results dataframe
+  df_length <- rbind(df_length, i_df2)
+  
+  rm(i, i_df, i_name, i_df2)
+}
+
+head(df_length)
+tail(df_length)
+table(df_length$netname, useNA="ifany")
+
+## clean up f1 and f2
+rm(f1, f2)
+
+## split out netname into cruise and net
+df_length$cruise <- substr(df_length$netname, 1, 7)
+df_length$netnumber <- substr(df_length$netname, 9, 12)
+
+## turn krill length into numeric
+df_length$krill_length <- as.numeric(df_length$krill_length)
+table(df_length$krill_length, useNA="always")
+## remove NAs
+df_length <- subset(df_length, !is.na(krill_length))
+table(df_length$krill_length, useNA="always")
+
+## keep only the nets that we're interested in
+nets_to_keep <- unique(df_dbdiff$netname)
+df_length <- subset(df_length, netname %in% nets_to_keep)
+table(df_length$netname, useNA="ifany")
 
 
 
