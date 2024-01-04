@@ -2,7 +2,7 @@
 
 
 #Natalie Nickells
-#2nd January 2024
+#3rd January 2024
 
 #Aim: to get net start and end times from a list of nets where krill were measured. 
 
@@ -12,6 +12,14 @@
 
 #This script is an updated version/draws heavily on "Testing_ExtractingEventNames_JR17002.R", 
 #at filepath D:\R code\Testing_ExtractingEventNames_JR17002.R
+
+#Data sources:
+#netnames.csv, created in script '1 Lising nets and cruises where krill were measured', also in GitHub repo Krill_Length_Frequency
+
+#Data output: 
+
+
+#Current known errors:
 
 #SET UP================================================================================
 
