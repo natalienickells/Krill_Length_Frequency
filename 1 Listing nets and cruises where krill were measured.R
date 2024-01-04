@@ -1,10 +1,13 @@
- 
+#1 Listing nets and cruises where krill were measured
+
+
 #Natalie Nickells
 #12th December 2023
 #Aim: Identifying cruises & nets for which I have krill length data
 
 #This script will be written in R Studio but version control will be used, 
 #in GitHub repo Krill_Length_Frequency
+
 
 #This script is an updated version of "ExtractingEventNAmes.R", at filepath D:\R code\ExtractingEventNAmes.R
 
@@ -17,7 +20,7 @@ library(openxlsx)
 #Setting working directory 
 setwd("D:\\Cruise_data\\")
 
-#DATA IMPORT====================================================================
+#LIST OF NETS ====================================================================
 #My data for each cruise has a different name and filepath. 
 #I have a spreadsheet where these different filepaths are kept, so will first read this in. 
 
@@ -37,8 +40,12 @@ for(i in 1: nrow(filepathinfo)) {
   
   cruise<- filepathinfo$Cruise_ID[i]
   filepath<-filepathinfo$KL_Data_Filepath[i]
-  
+  print(filepath)
   if(grepl(".csv", filepath)){ #at the mo this is only true for JR228 
+    #if it has the format of KLF data from the PDC, to get the net names, 
+    #read in the data and then go to the event name column and find all the unique net name
+    #make a variable of cruise, event name, net number 
+    #add the cruise name on the front before adding them to an overall list of net names
     
     #Reading in CSV file
     df <-read.csv((paste0(filepath)))
@@ -52,13 +59,20 @@ for(i in 1: nrow(filepathinfo)) {
     assign(print(paste0(cruise, "KLFrawdata")), df)
     
     #then will want to add those common codes, along with the cruise, to a blank dataframe that I will want to populate
+    
     rm(df)
+    
+    
     }
   
+  #if it has the format of a spreadsheet, with each tab as a net, 
+  #read in the tab names and these are the event names
+  #add the cruise name on the front before adding them to an overall list of net names
   
   if(grepl(".xlsx", filepath)){
     
     netnames<- (paste0(cruise,"_", getSheetNames(filepath)))
+    #print(netnames)
     #assign(print(paste0(cruise, "KLFrawdata")), read_excel((paste0(filepath))))
   }
   
@@ -74,6 +88,22 @@ for(i in 1: nrow(filepathinfo)) {
     #test<- lapply(excel_sheets(filepath), read_excel, path = filepath)
   }
   
+  
+  
+  #Filtering net names
+  
+  #Making a vector of all the net names I don't want
+ 
+  remove<- c("Summary", "SUMMARY", "plot",  "all", "combined", "Combined", 
+             "comparison", "t-test", "Thys", "_T", "F", "RMT25",
+            "frig", "thyso", "hist", "Frigida", "All", "Sheet", "corebox", 
+             "Graphs" ) 
+  netnames<- netnames[str_which(netnames, paste(remove, collapse= "|"), negate = TRUE)] #gives position
+
+  print(str_which(netnames, paste(remove, collapse= "|"), negate = TRUE))
+  netnames<- str_replace_all(netnames, "RMT8|Event|Ev|EV|E|e", "")
+  netnames<- str_replace_all(netnames, "N", "_")
+
   #now make dataframe 
   #cruise in one column
   #netnames in another column
@@ -85,7 +115,7 @@ for(i in 1: nrow(filepathinfo)) {
   #Binding to existing dataframe
   output<- rbind(output, temp)
   
-  rm(temp)
+  rm(temp, netnames, cruise, filepath)
 }
 
 #Filtering net names
@@ -114,83 +144,33 @@ test<- str_remove(output$netnames, "Ev")#removing Ev from event numbers
 
 JR177.KLF.events <- str_replace(JR177.KLF.events, "N", "_")
 
+#Doing some extra net name filtering after the loop
+#Could definitely even do some more filtering here, but will come back to (eg.r emoving spaces, removing JR100_JR100_)
+pos<- str_which(output$netnames, "freq|_T|swarm|CB|comp|JR082|layr", negate=T ) 
+#removing JR082 nets here because their format is unclear, to come back to. 
+
+output<- output[pos,]
+
+write.csv(output, "netnames.csv", row.names=F)
+
+
 #At the moment this is only importing the first tab of the spreadsheet, need to import the whole thing
 #think that I can use some of my scripting from Lizzie density reading script to read in each tab. 
 
 #Also could just make this script into also reading in krill length data and saving it. Since I'm pretty much going to be there already. 
 
-
-#in pseudo code
-
-#if it has the format of KLF data from the PDC, to get the net names, 
-#read in the data and then go to the event name column and find all the unique net names
-#make a variable of cruise, event name, net number 
-#add the cruise name on the front before adding them to an overall list of net names
-
-#if it has the format of a spreadsheet, with each tab as a net, 
-#read in the tab names and these are the event names
-#add the cruise name on the front before adding them to an overall list of net names
+#would want to use the tab names from this (although some won't be in exactly this format)
 
 #if it has another format
 #print the cruise name with a message 'problematic format, net names to be extracted by hand
-
+#NEED TO GO THROUGH AND WORK OUT WHICH CRUISES THIS IS TRUE FOR.
 #and then will extract those net names outside of the function. 
 
-for(i in 1: nrow(filepathinfo)) {
-  
-  cruise<- filepathinfo$Cruise_ID[i]
-  filepath<-filepathinfo$KL_Data_Filepath[i]
-  
-  if(grepl(".csv", filepath)){ #at the mo this is only true for JR228 
-    df <-read.csv((paste0(filepath)))
-    
-    df <- unite(df, common.code, c(Cruise,Event, Netno))
-    
-    netnames<- unique(df$common.code)
-    
-    #assign(print(paste0(cruise, "KLFrawdata")), df)
-    
-    #then will want to add those common codes, along with the cruise, to a blank dataframe that I will want to populate
-    rm(df)
-  }
-  
-  
-  if(grepl(".xlsx", filepath)){
-    
-    netnames<- (paste0(cruise,"_", getSheetNames(filepath)))
-    #assign(print(paste0(cruise, "KLFrawdata")), read_excel((paste0(filepath))))
-  }
-  
-  
-  if(grepl(".xls", filepath)){
-    #Getting the net names
-    netnames<-(paste0(cruise,"_", excel_sheets(filepath)))
-    
-    #Reading the data
-    #assign(print(paste0(cruise, "KLFrawdata")), read_excel((paste0(filepath))))
-    
-    #testing out reading this data in
-    #test<- lapply(excel_sheets(filepath), read_excel, path = filepath)
-  }
-  
-  #now make dataframe 
-  #cruise in one column
-  #netnames in another column
-  
-  #Making dataframe of net names
-  temp<- data.frame(netnames, 
-                    cruise)
-  
-  #Binding to existing dataframe
-  output<- rbind(output, temp)
-  
-  rm(temp)
-}
 
 
 
 
-#Rememberering what the excel sheets function does
+#Remembering what the excel sheets function does
 
 test<- excel_sheets(filepathinfo$KL_Data_Filepath[15])
 #okay so it literally just gets the names of the tabs out and makes them ito a vector 
