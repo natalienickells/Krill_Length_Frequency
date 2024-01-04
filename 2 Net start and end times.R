@@ -16,11 +16,8 @@
 #Data sources:
 #netnames.csv, created in script '1 Lising nets and cruises where krill were measured', also in GitHub repo Krill_Length_Frequency
 
-#Data output: 
-
 
 #Current known errors:
-
 #SET UP================================================================================
 
 #importing list of net names
