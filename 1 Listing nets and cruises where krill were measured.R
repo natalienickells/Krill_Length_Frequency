@@ -3,7 +3,7 @@
 
 
 #Natalie Nickells
-#4th January 2024
+#5th January 2024
 #Aim: Identifying cruises & nets for which I have krill length data
 #Aim 2: Reading in the krill length frequency data for those nets, saving in a useful format
 
@@ -31,7 +31,7 @@ setwd("D:\\Cruise_data\\")
 #My data for each cruise has a different name and filepath. 
 #I have a spreadsheet where these different filepaths are kept, so will first read this in. 
 
-library(readxl)
+
 filepathinfo<- read_excel("D:\\KLF Cruises & Nets - Data Tracking Sheet.xlsx")
 
 
@@ -134,22 +134,22 @@ for(i in nrow(output)){
   netname<- output$netnames[i]
   
   
-  #then do the filtering here
 }
 
-                             
+#Doing some extra net name filtering after the loop, 
+#removing any nets with the words freq, swarm, CB, comp, layr, b
+pos<- str_which(output$netnames, "freq|swarm|CB|comp|JR082|layr|b", negate=T ) #finding positions where these words are not featured
+output<- output[pos,] #making the output only include those positions where the words are not featured. 
 
-
-#Doing some extra net name filtering after the loop
-#TK Could definitely even do some more filtering here, but will come back to 
-pos<- str_which(output$netnames, "freq|swarm|CB|comp|JR082|layr|b", negate=T ) 
-#TK removing JR082 nets here because their format is unclear, to come back to. 
 #removing nets including 'b' as these were second measurings on the JR177 cruise, with less fresh krill. The data spreadsheet advises not to use these values. 
+#TK maybe type out all the reasonings for removing nets with these words. 
+#TK removing JR082 nets here because their format is unclear, to come back to. 
+
 #TK- for everything i'm removing here, need to go back to the spreadsheets 
 #and check what this actually represents, make sure i am not pointlessly losing data. #have now done this
-output<- output[pos,]
 
-#
+
+
 #Script refining/checking=====================================================
 #Examining this output, what do I have.... (basically looking for errors to correct later.)
 #Will basically need to go through cruise by cruise and check I have all the nets I expect to have.. 
@@ -158,118 +158,114 @@ output<- output[pos,]
 unique(output$cruise)  
 length(unique(output$cruise)) #have 18 cruises
 #I have 20 cruises to target, so missing 2: JR082 and JR245
+#TK NEED TO COME BACK AND MAKE SURE JR082 AND JR245 ARE INCLUDED. 
 
 
-
-#Go through EVERY CRUISE and identify which nets I should have. Are these correct?
-
-
-#Will go through and check the nets for each of the cruises I have
-#Also need to identify- which cruises are missing?   
-
-#DY098-----
+#Going through EVERY CRUISE and identify which nets I should have. Are these correct?
+#DY098----- #CORRECT
 (filter(output, cruise== "DY098")) #29 nets, as expected.
 
 #78_1, 79_1, 93, 97_1, 109_1, and so on very few euphausids measured... 
-#TK basically need a filter later for a minimum nu,ber measured.
+#TK basically need a filter later for a minimum number measured.
 
  
 
-#JR082----
+#JR082---- #NEEDS CORRECTIONS
 #Currently missing the net names for this, this is a different format than I've seen so far
 #there is one tab for all nets, so I need to read this in and extract the unique combos of net and event
 
-#JR096---
+#JR096--- #CORRECT
 filter(output, cruise== "JR096") 
-#13 nets, all as expected 
+#13 nets, all as expected  
 
 
-#JR100
+#JR100 --- #CORRECT
 filter(output, cruise== "JR100") 
-#8 nets, all as expected 
+#8 nets, all as expected  
 
 
-#JR116
+#JR116 ---- #NEEDS CORRECTIONS
 filter(output, cruise== "JR116") 
 #3 nets, missing those associated with moorings and core box...
 #TK come back to: I think I probably want to keep those mooring/core box nets. 
 
-#JR177
+#JR177--- #CORRECT
 filter(output, cruise== "JR177") 
 #46 nets, all as expected
 #have removed 'event 28 all nets', but there were only 10 krill measured there so this is fine
 #have removed 'b' versions of the nets, which were second, less fresh, measurings of the krill. 
 
 
-#JR200
+#JR200---- #CORRECT
 filter(output, cruise== "JR200") 
 #9 nets, all as expected
 
 
-#JR228
+#JR228---- #CORRECT
 filter(output, cruise== "JR228") 
 #hmmm.. this is correct but I have no udea how? Not in the format I was expecting when I opened the spreadhsset. 
 # I obviously must have fixed this earlier. TK come back to. 7 nets. 
 #I think possibly the data from JR228 is not going to work, the krill length data is not great and I'm not sure there are many nets where krill were measured? Confusing.. 
 
 
-#JR230
+#JR230 #CORRECT, although this cruise is a candidate for removal, given low krill measuring numbers
 filter(output, cruise== "JR230") 
 #2 nets, as expected
 #Looking at the data, 96_1 has low krill measured number, so possibly could remove this entire cruise (only 1 useful net haul?)
 
-#JR245
+#JR245 #NEEDS CORRECTIONS
 #currently no net names
 #complicated sheet layout, tread carefully. Use WCB and ECB tabs. 
 
-#JR255
+#JR255 #CORRECT
 filter(output, cruise== "JR255")
 #14 nets, all as expected
 
-#JR260
+#JR260 #NEEDS CORRECTIONS
 filter(output, cruise== "JR260") 
 #12 nets. nets as expected EXCEPT: 
 #tk net numbers (not event numbers) are missing because they feature inside the tab instead of in the tab name. 
 #need to fix this. maybe manually if quicker?
 
-#JR280
+#JR280 #CORRECT
 filter(output, cruise== "JR280") 
 #8 nets, as expected
 
-#JR291
+#JR291 #CORRECT
 filter(output, cruise== "JR291") 
 #10 nets, as expected
 
 
-#JR304
+#JR304 #CORRECT
 filter(output, cruise== "JR304") 
 #7 nets, all as expected
 
-#JR15002
+#JR15002 #CORRECT
 filter(output, cruise== "JR15002") 
 #9 nets, all as expected
 
-#JR15004
+#JR15004 #CORRECT
 filter(output, cruise== "JR15004") 
 #19 nets, all as expected
 #this KLF data spreadsheet also has some good information , eg comparing top and bottom of swarms
 #I won't be importing the data here but TK might be good to come back to. 
 
 
-#JR16003
+#JR16003 #CORRECT
 filter(output, cruise== "JR16003") 
 #7 nets, all as expected
 
 
-#JR17002
+#JR17002 #CORRECT
 filter(output, cruise== "JR17002")
 #8 nets, all as expected
 
-#JR19001
+#JR19001 #CORRECT
 filter(output, cruise== "JR19001")
-#48_1 has a tab but krill not measured so need to delete that one
-# all other nets as expected, 10 nets total, 9 without 48_1.
+#48_1 has a tab but krill not measured so will delete that one
 output<- filter(output, netnames != "JR19001_48_1")
+
+# all other nets as expected, 9 nets total (exc. 48_1)
 
 
 
@@ -278,8 +274,30 @@ write.csv (output, "netnames.csv", row.names=F)
 #218 cruises total
 
 
+#Importing KLF data=============================================================
+
+#Although some of this will be repetition from above, I will at least start off 
+#by writing this as a separate part of the code, makes more sense to me. 
+#Originally wanted it to be a whole separate script!
 
 
+
+#Building multiple sheets function
+
+#TK need to remember: what does this multiple sheets function do?
+multiplesheets <- function(fname) { 
+  
+  # getting info about all excel sheets 
+  sheets <- readxl::excel_sheets(fname) 
+  tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x)) 
+  data_frame <- lapply(tibble, as.data.frame) 
+  
+  # assigning names to data frames 
+  names(data_frame) <- sheets 
+  
+  # print data frame 
+  print(data_frame) 
+} 
 
 
 
@@ -320,20 +338,6 @@ test<- lapply(excel_sheets(path), read_excel, path = path)
 files_length <- c("D:\\Cruise_data\\JR17002\\JR17002_krill_length_V2.xlsx",
                   "D:\\Cruise_data\\JR16003\\Krill_lengths_JR16003.xls")
 
-library(readxl)     
-multiplesheets <- function(fname) { 
-  
-  # getting info about all excel sheets 
-  sheets <- readxl::excel_sheets(fname) 
-  tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x)) 
-  data_frame <- lapply(tibble, as.data.frame) 
-  
-  # assigning names to data frames 
-  names(data_frame) <- sheets 
-  
-  # print data frame 
-  print(data_frame) 
-} 
 
 ## read in file 1 as a list
 f1 <- multiplesheets(files_length[1])
